@@ -1,0 +1,127 @@
+import java.util.*;
+
+// Enum for vehicle types
+enum VehicleType {
+    MOTORCYCLE, CAR, BUS
+}
+
+// Class representing a vehicle
+class Vehicle {
+    private String licensePlate;
+    private VehicleType type;
+
+    public Vehicle(String licensePlate, VehicleType type) {
+        this.licensePlate = licensePlate;
+        this.type = type;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public VehicleType getType() {
+        return type;
+    }
+}
+
+// Class representing a parking spot
+class ParkingSpot {
+    private String spotId;
+    private boolean available;
+    private VehicleType size;
+
+    public ParkingSpot(String spotId, VehicleType size) {
+        this.spotId = spotId;
+        this.size = size;
+        this.available = true;
+    }
+
+    public String getSpotId() {
+        return spotId;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public VehicleType getSize() {
+        return size;
+    }
+
+    public void parkVehicle() {
+        available = false;
+    }
+
+    public void removeVehicle() {
+        available = true;
+    }
+}
+
+// Class representing a parking lot
+class ParkingLot {
+    private Map<VehicleType, List<ParkingSpot>> parkingSpots;
+
+    public ParkingLot() {
+        parkingSpots = new HashMap<>();
+        for (VehicleType type : VehicleType.values()) {
+            parkingSpots.put(type, new ArrayList<>());
+        }
+        // Initialize parking spots for each type of vehicle
+        initializeParkingSpots();
+    }
+
+    private void initializeParkingSpots() {
+        // For demonstration purposes, let's assume we have 10 spots for each vehicle type
+        for (VehicleType type : VehicleType.values()) {
+            for (int i = 1; i <= 10; i++) {
+                parkingSpots.get(type).add(new ParkingSpot(type.toString() + "-" + i, type));
+            }
+        }
+    }
+
+    public boolean parkVehicle(Vehicle vehicle) {
+        List<ParkingSpot> spots = parkingSpots.get(vehicle.getType());
+        for (ParkingSpot spot : spots) {
+            if (spot.isAvailable()) {
+                spot.parkVehicle();
+                System.out.println("Vehicle with license plate " + vehicle.getLicensePlate() +
+                                   " parked at spot " + spot.getSpotId());
+                return true;
+            }
+        }
+        System.out.println("No available spot for vehicle with license plate " + vehicle.getLicensePlate());
+        return false;
+    }
+
+    public void removeVehicle(Vehicle vehicle) {
+        List<ParkingSpot> spots = parkingSpots.get(vehicle.getType());
+        for (ParkingSpot spot : spots) {
+            if (!spot.isAvailable() && spot.getSize() == vehicle.getType()) {
+                spot.removeVehicle();
+                System.out.println("Vehicle with license plate " + vehicle.getLicensePlate() +
+                                   " removed from spot " + spot.getSpotId());
+                return;
+            }
+        }
+        System.out.println("Vehicle with license plate " + vehicle.getLicensePlate() + " not found in parking lot");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ParkingLot parkingLot = new ParkingLot();
+
+        // Park some vehicles
+        Vehicle vehicle1 = new Vehicle("ABC123", VehicleType.CAR);
+        parkingLot.parkVehicle(vehicle1);
+
+        Vehicle vehicle2 = new Vehicle("XYZ456", VehicleType.MOTORCYCLE);
+        parkingLot.parkVehicle(vehicle2);
+
+        Vehicle vehicle3 = new Vehicle("DEF789", VehicleType.BUS);
+        parkingLot.parkVehicle(vehicle3);
+
+        // Remove a vehicle
+        parkingLot.removeVehicle(vehicle2);
+    }
+}
